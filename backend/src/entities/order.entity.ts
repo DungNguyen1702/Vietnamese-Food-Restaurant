@@ -61,7 +61,9 @@ export class Order {
     @CreateDateColumn()
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({
+        nullable: true,
+    })
     updatedAt: Date;
 
     @ManyToOne(() => Account, account => account.orders)
