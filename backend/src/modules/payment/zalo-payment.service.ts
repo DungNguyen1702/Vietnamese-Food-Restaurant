@@ -33,7 +33,7 @@ export class ZaloPaymentService {
     ) {}
 
     async createPayment(lang: string, body: OrderRequest, account: Account) {
-        const { carts, totalPrice } = body;
+        const { carts, totalPrice, rootRedirectUrl } = body;
 
         const deployedLink = this.configService.get<string>(
             'DEPLOY_SERVICE_LINK'
@@ -46,13 +46,17 @@ export class ZaloPaymentService {
             endpoint: this.configService.get<string>('ZALOPAY_ENDPOINT_CREATE'),
         };
 
-        const embed_data = {
-            redirecturl: this.configService.get<string>('ZALOPAY_REDIRC_URL'),
-        };
-
+        
         const transID = Math.floor(Math.random() * 1000000);
 
         const appTransId = `${moment().format('YYMMDD')}_${transID}`;
+
+        const embed_data = {
+            redirecturl: `${rootRedirectUrl}/${this.configService.get<string>('ZALOPAY_REDIRC_URL')}/${appTransId}`,
+            // redirecturl: `https://www.youtube.com/watch?v=eu92rCLN9Do`,
+        };
+
+        console.log(embed_data.redirecturl)
 
         const items = [
             {
@@ -124,7 +128,7 @@ export class ZaloPaymentService {
             app_time: Date.now(),
             item: JSON.stringify(items),
             embed_data: JSON.stringify(embed_data),
-            amount: totalPrice * 1000,
+            amount: totalPrice,
             description: `Product - Payment for the order #${transID}`,
             bank_code: '',
             callback_url: `${deployedLink}/payment/zalo/callback`,
